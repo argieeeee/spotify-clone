@@ -1,5 +1,5 @@
 import {createRouteHandlerClient} from "@supabase/auth-helpers-nextjs";
-import {headers, cookies} from "next/headers";
+import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 
 import {stripe} from "@/libs/stripe";
@@ -13,7 +13,6 @@ export async function POST(request: Request) {
 		const supabase = createRouteHandlerClient({
 			cookies,
 		});
-
 		const {
 			data: {user},
 		} = await supabase.auth.getUser();
@@ -36,16 +35,15 @@ export async function POST(request: Request) {
 			mode: "subscription",
 			allow_promotion_codes: true,
 			subscription_data: {
-				trial_from_plan: true,
 				metadata,
 			},
 			success_url: `${getURL()}/account`,
-			cancel_url: `${getURL()}`,
+			cancel_url: `${getURL()}/`,
 		});
 
 		return NextResponse.json({sessionId: session.id});
-	} catch (error: any) {
-		console.log(error);
+	} catch (err: any) {
+		console.log(err);
 		return new NextResponse("Internal Error", {status: 500});
 	}
 }
